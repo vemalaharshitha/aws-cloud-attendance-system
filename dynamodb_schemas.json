@@ -1,0 +1,40 @@
+{
+  "Users": {
+    "TableName": "Users",
+    "KeySchema": [
+      {
+        "AttributeName": "username",
+        "KeyType": "HASH"
+      }
+    ],
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "username",
+        "AttributeType": "S"
+      }
+    ]
+  },
+  "Attendance": {
+    "TableName": "Attendance",
+    "KeySchema": [
+      {
+        "AttributeName": "studentId",
+        "KeyType": "HASH"
+      },
+      {
+        "AttributeName": "date_time",
+        "KeyType": "RANGE"
+      }
+    ],
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "studentId",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "date_time",
+        "AttributeType": "S"
+      }
+    ]
+  }
+}

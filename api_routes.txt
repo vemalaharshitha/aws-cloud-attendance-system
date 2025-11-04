@@ -1,0 +1,9 @@
+/mark            POST    -> markAttendance.py
+/history         GET     -> getHistory.py
+/analytics       GET     -> getStats.py
+/downloadExcel   GET     -> exportExcel.py
+/downloadCSV     GET     -> exportCSV.py
+/getUploadUrl    POST    -> generateSignedURL.py
+/login          POST     -> login.py
+/manageUser     POST     -> upsertUser.py  (admin only)
+/listUsers      GET      -> listUsers.py   (admin only)
