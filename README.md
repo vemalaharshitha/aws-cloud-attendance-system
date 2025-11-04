@@ -25,16 +25,3 @@ This package contains a COMPLETE, copy-paste implementation for a serverless Att
    ```
 5. Upload `/frontend` files to your frontend S3 bucket.
 
-## Security Notes
-- Demo uses plaintext passwords for simplicity. For production, hash passwords (e.g., bcrypt) and use Cognito/JWT.
-- All responses include CORS header `Access-Control-Allow-Origin: *` for ease of testing—tighten for production.
-- Keep S3 buckets private. Photo uploads use **presigned PUT URLs**.
-
-## Viva Talking Points
-- Why Serverless (scalability, zero-maint, pay-per-use)
-- Why DynamoDB over RDBMS (low-latency key access, autoscale)
-- Presigned URLs for secure uploads (no credentials in browser)
-- API Gateway + Lambda + CloudWatch logs
-- Future scope: Rekognition face attendance, OTP login, CloudFront CDN
-
-Good luck! 🚀
