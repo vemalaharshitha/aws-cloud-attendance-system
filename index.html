@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Attendance | Professional</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    :root {
+      --primary: #000000;
+      --secondary: #1a1a1a;
+      --accent: #ffffff;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --dark: #0a0a0a;
+      --light: #f8fafc;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--gray-900);
+      min-height: 100vh;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: var(--gray-100);
+      --card-bg: rgba(30, 41, 59, 0.8);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+
+    body.dark-mode .logo h1 {
+      color: white;
+    }
+
+    .logo p {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .theme-toggle {
+      width: 50px;
+      height: 26px;
+      background: var(--gray-300);
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .theme-toggle {
+      background: var(--gray-700);
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    body.dark-mode .theme-toggle::after {
+      left: 27px;
+      background: var(--gray-900);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--card-border);
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--gray-800));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    body.dark-mode .user-name {
+      color: white;
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      background: var(--card-bg);
+      padding: 8px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--card-border);
+    }
+
+    .tab {
+      padding: 14px 24px;
+      background: transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+      font-size: 0.95rem;
+    }
+
+    body.dark-mode .tab {
+      color: var(--gray-400);
+    }
+
+    .tab:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--gray-800);
+    }
+
+    body.dark-mode .tab:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--gray-200);
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 28px;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .card h2 {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    body.dark-mode .card h2 {
+      color: white;
+    }
+
+    .card h2 i {
+      font-size: 1.5rem;
+      color: var(--gray-600);
+    }
+
+    body.dark-mode .card h2 i {
+      color: var(--gray-400);
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--gray-700);
+      font-size: 0.95rem;
+    }
+
+    body.dark-mode label {
+      color: var(--gray-300);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--gray-300);
+      background: white;
+      color: var(--gray-900);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode input, body.dark-mode select {
+      background: var(--gray-800);
+      border-color: var(--gray-700);
+      color: var(--gray-100);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode input:focus, body.dark-mode select:focus {
+      border-color: var(--gray-500);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn {
+      padding: 16px 28px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+
+    body.dark-mode .btn-secondary {
+      background: var(--gray-800);
+      color: var(--gray-300);
+      border-color: var(--gray-700);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-100);
+      border-color: var(--gray-400);
+    }
+
+    body.dark-mode .btn-secondary:hover {
+      background: var(--gray-700);
+      border-color: var(--gray-600);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .stat-card {
+      background: var(--gray-800);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 1.5rem;
+    }
+
+    .stat-present .stat-icon {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .stat-absent .stat-icon {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .stat-total .stat-icon {
+      background: rgba(0, 0, 0, 0.1);
+      color: var(--primary);
+    }
+
+    body.dark-mode .stat-total .stat-icon {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .stat-rate .stat-icon {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+
+    .stat-present .stat-value {
+      color: var(--success);
+    }
+
+    .stat-absent .stat-value {
+      color: var(--danger);
+    }
+
+    .stat-total .stat-value {
+      color: var(--primary);
+    }
+
+    body.dark-mode .stat-total .stat-value {
+      color: white;
+    }
+
+    .stat-rate .stat-value {
+      color: #3b82f6;
+    }
+
+    .chart-container {
+      height: 320px;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    body.dark-mode th, body.dark-mode td {
+      border-bottom: 1px solid var(--gray-700);
+    }
+
+    th {
+      background: var(--gray-100);
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    body.dark-mode th {
+      background: var(--gray-800);
+      color: var(--gray-300);
+    }
+
+    tr:hover {
+      background: var(--gray-50);
+    }
+
+    body.dark-mode tr:hover {
+      background: var(--gray-700);
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-present {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .badge-absent {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .message {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-weight: 500;
+    }
+
+    .message-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .message-error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .admin-only {
+      display: none;
+    }
+
+    .is-admin .admin-only {
+      display: block;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      padding: 24px;
+      color: var(--gray-500);
+      font-size: 0.875rem;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    body.dark-mode .footer {
+      border-top: 1px solid var(--gray-700);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--gray-800);
+    }
+
+    body.dark-mode .section-title {
+      color: var(--gray-200);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+        justify-content: center;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+      }
+      
+      .user-info {
+        align-self: flex-end;
+      }
+    }
+
+    /* Modern UI Enhancements */
+    .divider {
+      height: 1px;
+      background: var(--gray-200);
+      margin: 24px 0;
+    }
+
+    body.dark-mode .divider {
+      background: var(--gray-700);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    body.dark-mode .progress-bar {
+      background: var(--gray-700);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    .progress-present {
+      background: var(--success);
+    }
+
+    .progress-absent {
+      background: var(--danger);
+    }
+
+    .feature-highlight {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 24px;
+      border: 1px solid var(--card-border);
+    }
+
+    body.dark-mode .feature-highlight {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    }
+
+    .feature-highlight h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--gray-800);
+    }
+
+    body.dark-mode .feature-highlight h3 {
+      color: var(--gray-200);
+    }
+
+    .feature-highlight p {
+      color: var(--gray-600);
+      line-height: 1.5;
+    }
+
+    body.dark-mode .feature-highlight p {
+      color: var(--gray-400);
+    }
+
+    /* NEW UI ADDITIONS */
+    
+    /* Loading Spinner */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    body.dark-mode .spinner {
+      border-color: rgba(255, 255, 255, 0.1);
+      border-left-color: white;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Success Animation */
+    .success-checkmark {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+    }
+    
+    .check-icon {
+      width: 80px;
+      height: 80px;
+      position: relative;
+      border-radius: 50%;
+      box-sizing: content-box;
+      border: 4px solid var(--success);
+    }
+    
+    .check-icon::before {
+      top: 3px;
+      left: -2px;
+      width: 30px;
+      transform-origin: 100% 50%;
+      border-radius: 100px 0 0 100px;
+    }
+    
+    .check-icon::after {
+      top: 0;
+      left: 30px;
+      width: 60px;
+      transform-origin: 0 50%;
+      border-radius: 0 100px 100px 0;
+      animation: rotate-circle 4.25s ease-in;
+    }
+    
+    .check-icon::before, .check-icon::after {
+      content: '';
+      height: 100px;
+      position: absolute;
+      background: white;
+      transform: rotate(-45deg);
+    }
+    
+    .icon-line {
+      height: 5px;
+      background-color: var(--success);
+      display: block;
+      border-radius: 2px;
+      position: absolute;
+      z-index: 10;
+    }
+    
+    .icon-line.line-tip {
+      top: 46px;
+      left: 14px;
+      width: 25px;
+      transform: rotate(45deg);
+      animation: icon-line-tip 0.75s;
+    }
+    
+    .icon-line.line-long {
+      top: 38px;
+      right: 8px;
+      width: 47px;
+      transform: rotate(-45deg);
+      animation: icon-line-long 0.75s;
+    }
+    
+    @keyframes rotate-circle {
+      0% { transform: rotate(-45deg); }
+      5% { transform: rotate(-45deg); }
+      12% { transform: rotate(-405deg); }
+      100% { transform: rotate(-405deg); }
+    }
+    
+    @keyframes icon-line-tip {
+      0% { width: 0; left: 1px; top: 19px; }
+      54% { width: 0; left: 1px; top: 19px; }
+      70% { width: 50px; left: -8px; top: 37px; }
+      84% { width: 17px; left: 21px; top: 48px; }
+      100% { width: 25px; left: 14px; top: 45px; }
+    }
+    
+    @keyframes icon-line-long {
+      0% { width: 0; right: 46px; top: 54px; }
+      65% { width: 0; right: 46px; top: 54px; }
+      84% { width: 55px; right: 0px; top: 35px; }
+      100% { width: 47px; right: 8px; top: 38px; }
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+    }
+
+    .fab-menu {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .fab-menu.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .fab-item {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .fab-item:hover {
+      transform: scale(1.1);
+    }
+
+    /* Search and Filter */
+    .search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+    }
+
+    .filter-options {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: white;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    body.dark-mode .filter-btn {
+      background: var(--gray-800);
+      border-color: var(--gray-700);
+      color: var(--gray-300);
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      padding: 16px 20px;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 350px;
+      transform: translateX(400px);
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--primary);
+    }
+
+    body.dark-mode .toast {
+      background: var(--gray-800);
+      border-left-color: var(--gray-600);
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+    }
+
+    .toast.warning {
+      border-left-color: var(--warning);
+    }
+
+    .toast-icon {
+      font-size: 1.2rem;
+    }
+
+    .toast.success .toast-icon {
+      color: var(--success);
+    }
+
+    .toast.error .toast-icon {
+      color: var(--danger);
+    }
+
+    .toast.warning .toast-icon {
+      color: var(--warning);
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .toast-message {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+    }
+
+    body.dark-mode .toast-message {
+      color: var(--gray-400);
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--gray-500);
+    }
+
+    /* Student Profile Popup */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .popup-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .student-popup {
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .student-popup {
+      background: var(--gray-800);
+    }
+
+    .popup-overlay.show .student-popup {
+      transform: scale(1);
+    }
+
+    .popup-header {
+      padding: 24px;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .popup-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .popup-student-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+
+    .popup-student-info p {
+      opacity: 0.8;
+    }
+
+    .popup-body {
+      padding: 24px;
+    }
+
+    .popup-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .popup-stat {
+      text-align: center;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--gray-100);
+    }
+
+    body.dark-mode .popup-stat {
+      background: var(--gray-700);
+    }
+
+    .popup-stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .popup-stat-label {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+    }
+
+    body.dark-mode .popup-stat-label {
+      color: var(--gray-400);
+    }
+
+    .popup-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Period Selector */
+    .period-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .period-option {
+      padding: 16px;
+      border-radius: 12px;
+      background: white;
+      border: 1px solid var(--gray-300);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .period-option {
+      background: var(--gray-800);
+      border-color: var(--gray-700);
+    }
+
+    .period-option:hover {
+      border-color: var(--primary);
+    }
+
+    .period-option.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .period-time {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    /* Heatmap Calendar */
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .calendar-day.empty {
+      background: transparent;
+      cursor: default;
+    }
+
+    .calendar-day.present {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .calendar-day.absent {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+
+    .calendar-day:hover:not(.empty) {
+      transform: scale(1.1);
+    }
+
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 768px) {
+      .fab {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+      
+      .fab-menu {
+        bottom: 80px;
+        right: 20px;
+      }
+      
+      .fab-item {
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+      }
+      
+      .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+      }
+      
+      .toast {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Cloud Attendance</h1>
+          <p>Professional Attendance Management System</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <div class="theme-toggle" id="theme-toggle"></div>
+        <div class="user-info">
+          <div class="avatar">JS</div>
+          <div class="user-details">
+            <div class="user-name">John Smith</div>
+            <div class="user-role">Faculty Administrator</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="nav-tabs">
+      <button class="tab active" data-tab="dashboard">
+        <i class="fas fa-chart-pie"></i> Dashboard
+      </button>
+      <button class="tab" data-tab="attendance">
+        <i class="fas fa-edit"></i> Mark Attendance
+      </button>
+      <button class="tab" data-tab="qr">
+        <i class="fas fa-qrcode"></i> QR Scanner
+      </button>
+      <button class="tab" data-tab="history">
+        <i class="fas fa-history"></i> History
+      </button>
+      <button class="tab" data-tab="analytics">
+        <i class="fas fa-chart-bar"></i> Analytics
+      </button>
+      <button class="tab" data-tab="upload">
+        <i class="fas fa-cloud-upload-alt"></i> Upload Photos
+      </button>
+      <button class="tab admin-only" data-tab="users">
+        <i class="fas fa-users-cog"></i> User Management
+      </button>
+      <button class="tab" id="logout-tab">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div class="tab-content active" id="dashboard">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h2>
+        </div>
+        <div class="stats-container">
+          <div class="stat-card stat-present">
+            <div class="stat-icon">
+              <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-value">87</div>
+            <div>Today's Present</div>
+            <div class="progress-bar">
+              <div class="progress-fill progress-present" style="width: 87%"></div>
+            </div>
+          </div>
+          <div class="stat-card stat-absent">
+            <div class="stat-icon">
+              <i class="fas fa-user-times"></i>
+            </div>
+            <div class="stat-value">13</div>
+            <div>Today's Absent</div>
+            <div class="progress-bar">
+              <div class="progress-fill progress-absent" style="width: 13%"></div>
+            </div>
+          </div>
+          <div class="stat-card stat-total">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">120</div>
+            <div>Total Students</div>
+          </div>
+          <div class="stat-card stat-rate">
+            <div class="stat-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-value">87%</div>
+            <div>Weekly Attendance Rate</div>
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <div>
+            <div class="section-title">Weekly Attendance Trend</div>
+            <div class="chart-container">
+              <canvas id="dashboard-chart"></canvas>
+            </div>
+          </div>
+          <div>
+            <div class="section-title">Class Distribution</div>
+            <div class="chart-container">
+              <canvas id="class-chart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="feature-highlight">
+          <h3>Quick Actions</h3>
+          <p>Mark attendance for today's classes, view recent reports, or manage student records.</p>
+          <div class="btn-group" style="margin-top: 16px;">
+            <button class="btn btn-primary">
+              <i class="fas fa-plus"></i> Add New Student
+            </button>
+            <button class="btn btn-secondary">
+              <i class="fas fa-file-export"></i> Export Report
+            </button>
+            <button class="btn btn-secondary">
+              <i class="fas fa-cog"></i> Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mark Attendance Tab -->
+    <div class="tab-content" id="attendance">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-edit"></i> Mark Attendance</h2>
+        </div>
+        
+        <div class="form-group">
+          <label>Select Period</label>
+          <div class="period-selector">
+            <div class="period-option active" data-period="1">
+              Period 1
+              <div class="period-time">8:00 - 9:00</div>
+            </div>
+            <div class="period-option" data-period="2">
+              Period 2
+              <div class="period-time">9:00 - 10:00</div>
+            </div>
+            <div class="period-option" data-period="3">
+              Period 3
+              <div class="period-time">10:15 - 11:15</div>
+            </div>
+            <div class="period-option" data-period="4">
+              Period 4
+              <div class="period-time">11:15 - 12:15</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="regno">Student Register Number</label>
+          <input type="text" id="regno" placeholder="Enter student register number">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-success" onclick="markAttendance('Present')">
+            <i class="fas fa-check-circle"></i> Mark Present
+          </button>
+          <button class="btn btn-danger" onclick="markAttendance('Absent')">
+            <i class="fas fa-times-circle"></i> Mark Absent
+          </button>
+        </div>
+        <div id="attendance-message" class="message"></div>
+        
+        <div class="divider"></div>
+        
+        <div class="feature-highlight">
+          <h3>Bulk Attendance</h3>
+          <p>Upload a CSV file with student IDs to mark attendance for multiple students at once.</p>
+          <div class="btn-group" style="margin-top: 16px;">
+            <button class="btn btn-secondary">
+              <i class="fas fa-download"></i> Download Template
+            </button>
+            <button class="btn btn-primary">
+              <i class="fas fa-upload"></i> Upload CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR Attendance Tab -->
+    <div class="tab-content" id="qr">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-qrcode"></i> QR Code Attendance</h2>
+        </div>
+        <p style="margin-bottom: 20px; color: var(--gray-600);">Scan student QR codes to quickly mark attendance.</p>
+        <div id="reader"></div>
+        <div id="qr-message" class="message"></div>
+        
+        <div class="divider"></div>
+        
+        <div class="feature-highlight">
+          <h3>Generate Student QR Codes</h3>
+          <p>Create printable QR codes for each student to streamline the attendance process.</p>
+          <div class="btn-group" style="margin-top: 16px;">
+            <button class="btn btn-primary">
+              <i class="fas fa-qrcode"></i> Generate All QR Codes
+            </button>
+            <button class="btn btn-secondary">
+              <i class="fas fa-print"></i> Print QR Sheets
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Tab -->
+    <div class="tab-content" id="history">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-history"></i> Attendance History</h2>
+        </div>
+        
+        <div class="search-box">
+          <input type="text" id="history-search" placeholder="Search by student name or ID...">
+          <button class="btn btn-primary">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+        
+        <div class="filter-options">
+          <button class="filter-btn active">All</button>
+          <button class="filter-btn">Present</button>
+          <button class="filter-btn">Absent</button>
+          <button class="filter-btn">This Week</button>
+          <button class="filter-btn">This Month</button>
+        </div>
+        
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="student-filter">Student Register Number (optional)</label>
+            <input type="text" id="student-filter" placeholder="Filter by register number">
+          </div>
+          <div class="form-group">
+            <label for="class-filter">Class/Group</label>
+            <select id="class-filter">
+              <option value="">All Classes</option>
+              <option value="cs101">CS 101</option>
+              <option value="math202">MATH 202</option>
+              <option value="eng150">ENG 150</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="from-date">From Date</label>
+            <input type="date" id="from-date">
+          </div>
+          <div class="form-group">
+            <label for="to-date">To Date</label>
+            <input type="date" id="to-date">
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="fetchHistory()">
+            <i class="fas fa-filter"></i> Apply Filters
+          </button>
+          <button class="btn btn-success" onclick="downloadExcel()">
+            <i class="fas fa-file-excel"></i> Export Excel
+          </button>
+          <button class="btn btn-secondary" onclick="downloadCSV()">
+            <i class="fas fa-file-csv"></i> Export CSV
+          </button>
+          <button class="btn btn-secondary" onclick="downloadPDF()">
+            <i class="fas fa-file-pdf"></i> Export PDF
+          </button>
+        </div>
+        <div id="history-results"></div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div class="tab-content" id="analytics">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-chart-bar"></i> Analytics & Reports</h2>
+        </div>
+        <div class="grid-2">
+          <div>
+            <div class="section-title">Attendance Distribution</div>
+            <div class="chart-container">
+              <canvas id="analytics-chart"></canvas>
+            </div>
+          </div>
+          <div>
+            <div class="section-title">Monthly Trends</div>
+            <div class="chart-container">
+              <canvas id="monthly-chart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="section-title">Attendance Calendar</div>
+        <div class="calendar" id="attendance-calendar">
+          <!-- Calendar will be generated by JavaScript -->
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="feature-highlight">
+          <h3>Advanced Analytics</h3>
+          <p>Generate detailed reports on attendance patterns, identify at-risk students, and track improvement over time.</p>
+          <div class="btn-group" style="margin-top: 16px;">
+            <button class="btn btn-primary">
+              <i class="fas fa-chart-line"></i> Performance Report
+            </button>
+            <button class="btn btn-secondary">
+              <i class="fas fa-user-clock"></i> At-Risk Students
+            </button>
+            <button class="btn btn-secondary">
+              <i class="fas fa-calendar-alt"></i> Semester Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Photo Tab -->
+    <div class="tab-content" id="upload">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-cloud-upload-alt"></i> Upload Student Photos</h2>
+        </div>
+        <div class="form-group">
+          <label for="photo-regno">Student Register Number</label>
+          <input type="text" id="photo-regno" placeholder="Enter student register number">
+        </div>
+        <div class="form-group">
+          <label for="photo-file">Select Photo</label>
+          <input type="file" id="photo-file" accept="image/*">
+        </div>
+        <button class="btn btn-primary" onclick="uploadPhoto()">
+          <i class="fas fa-upload"></i> Upload Photo
+        </button>
+        <div id="upload-message" class="message"></div>
+        
+        <div class="divider"></div>
+        
+        <div class="feature-highlight">
+          <h3>Bulk Photo Upload</h3>
+          <p>Upload multiple student photos at once by preparing a ZIP file containing images named with student IDs.</p>
+          <div class="btn-group" style="margin-top: 16px;">
+            <button class="btn btn-secondary">
+              <i class="fas fa-download"></i> Download Guidelines
+            </button>
+            <button class="btn btn-primary">
+              <i class="fas fa-file-archive"></i> Upload ZIP File
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Users Tab -->
+    <div class="tab-content admin-only" id="users">
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fas fa-users-cog"></i> User Management</h2>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="manage-username">Username</label>
+            <input type="text" id="manage-username" placeholder="Enter username">
+          </div>
+          <div class="form-group">
+            <label for="manage-password">Password</label>
+            <input type="password" id="manage-password" placeholder="Enter password">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="manage-role">Role</label>
+            <select id="manage-role">
+              <option value="faculty">Faculty</option>
+              <option value="admin">Administrator</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="manage-email">Email (optional)</label>
+            <input type="email" id="manage-email" placeholder="Enter email address">
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="saveUser()">
+            <i class="fas fa-save"></i> Save/Update User
+          </button>
+          <button class="btn btn-secondary" onclick="loadUsers()">
+            <i class="fas fa-list"></i> List All Users
+          </button>
+          <button class="btn btn-secondary">
+            <i class="fas fa-key"></i> Reset Password
+          </button>
+        </div>
+        <div id="user-message" class="message"></div>
+        <div id="users-list" style="margin-top: 20px;"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Cloud Attendance System • Professional Edition • v2.1</p>
+      <p style="margin-top: 8px;">Serverless Architecture • AWS Lambda • DynamoDB • S3</p>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <div class="fab" id="fab">
+    <i class="fas fa-plus"></i>
+  </div>
+  
+  <div class="fab-menu" id="fab-menu">
+    <div class="fab-item" title="Quick Mark Present">
+      <i class="fas fa-user-check"></i>
+    </div>
+    <div class="fab-item" title="Scan QR Code">
+      <i class="fas fa-qrcode"></i>
+    </div>
+    <div class="fab-item" title="Add New Student">
+      <i class="fas fa-user-plus"></i>
+    </div>
+    <div class="fab-item" title="Export Report">
+      <i class="fas fa-file-export"></i>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Student Profile Popup -->
+  <div class="popup-overlay" id="student-popup">
+    <div class="student-popup">
+      <div class="popup-header">
+        <div class="popup-avatar">JD</div>
+        <div class="popup-student-info">
+          <h3>John Doe</h3>
+          <p>ID: STU001 | CS 101</p>
+        </div>
+      </div>
+      <div class="popup-body">
+        <div class="popup-stats">
+          <div class="popup-stat">
+            <div class="popup-stat-value">87%</div>
+            <div class="popup-stat-label">Attendance</div>
+          </div>
+          <div class="popup-stat">
+            <div class="popup-stat-value">12</div>
+            <div class="popup-stat-label">Absences</div>
+          </div>
+        </div>
+        <div class="popup-actions">
+          <button class="btn btn-primary" style="flex: 1;">
+            <i class="fas fa-check"></i> Mark Present
+          </button>
+          <button class="btn btn-secondary" id="close-popup">
+            <i class="fas fa-times"></i> Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock API endpoints and data for demonstration
+    const API_BASE = 'https://api.example.com';
+    let currentUser = {
+      username: 'John Smith',
+      role: 'admin' // Change to 'faculty' to test non-admin view
+    };
+
+    // Check if user is admin
+    function isAdmin() {
+      return currentUser.role === 'admin';
+    }
+
+    // Initialize the application
+    function initApp() {
+      // Show admin features if user is admin
+      if (isAdmin()) {
+        document.body.classList.add('is-admin');
+      }
+      
+      // Initialize charts
+      initDashboardChart();
+      initClassChart();
+      initAnalyticsChart();
+      initMonthlyChart();
+      
+      // Initialize QR scanner
+      initQRScanner();
+      
+      // Set up tab navigation
+      setupTabs();
+      
+      // Set current date for date inputs
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('from-date').value = today;
+      document.getElementById('to-date').value = today;
+      
+      // Initialize theme toggle
+      initThemeToggle();
+      
+      // Initialize FAB
+      initFAB();
+      
+      // Initialize period selector
+      initPeriodSelector();
+      
+      // Initialize calendar
+      initCalendar();
+      
+      // Show welcome toast
+      setTimeout(() => {
+        showToast('Welcome to Cloud Attendance', 'System initialized successfully', 'success');
+      }, 1000);
+    }
+
+    // Set up tab navigation
+    function setupTabs() {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          if (tab.id === 'logout-tab') {
+            logout();
+            return;
+          }
+          
+          // Remove active class from all tabs and contents
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+    }
+
+    // Initialize theme toggle
+    function initThemeToggle() {
+      const themeToggle = document.getElementById('theme-toggle');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const savedTheme = localStorage.getItem('theme');
+      
+      // Set initial theme
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.body.classList.add('dark-mode');
+      }
+      
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      });
+    }
+
+    // Initialize Floating Action Button
+    function initFAB() {
+      const fab = document.getElementById('fab');
+      const fabMenu = document.getElementById('fab-menu');
+      
+      fab.addEventListener('click', () => {
+        fabMenu.classList.toggle('open');
+        fab.innerHTML = fabMenu.classList.contains('open') ? 
+          '<i class="fas fa-times"></i>' : '<i class="fas fa-plus"></i>';
+      });
+      
+      // Close FAB menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!fab.contains(e.target) && !fabMenu.contains(e.target)) {
+          fabMenu.classList.remove('open');
+          fab.innerHTML = '<i class="fas fa-plus"></i>';
+        }
+      });
+      
+      // Add functionality to FAB items
+      const fabItems = document.querySelectorAll('.fab-item');
+      fabItems.forEach((item, index) => {
+        item.addEventListener('click', () => {
+          switch(index) {
+            case 0:
+              // Quick mark present
+              document.querySelector('[data-tab="attendance"]').click();
+              showToast('Quick Action', 'Ready to mark attendance', 'success');
+              break;
+            case 1:
+              // Scan QR code
+              document.querySelector('[data-tab="qr"]').click();
+              break;
+            case 2:
+              // Add new student
+              showToast('Quick Action', 'Add student feature would open here', 'info');
+              break;
+            case 3:
+              // Export report
+              downloadExcel();
+              break;
+          }
+          fabMenu.classList.remove('open');
+          fab.innerHTML = '<i class="fas fa-plus"></i>';
+        });
+      });
+    }
+
+    // Initialize period selector
+    function initPeriodSelector() {
+      const periodOptions = document.querySelectorAll('.period-option');
+      periodOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          periodOptions.forEach(opt => opt.classList.remove('active'));
+          option.classList.add('active');
+          showToast('Period Selected', `Period ${option.dataset.period} selected`, 'info');
+        });
+      });
+    }
+
+    // Initialize calendar
+    function initCalendar() {
+      const calendar = document.getElementById('attendance-calendar');
+      const daysInMonth = 30;
+      const startDay = 2; // Wednesday
+      
+      // Add empty cells for days before the start of the month
+      for (let i = 0; i < startDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day empty';
+        calendar.appendChild(emptyDay);
+      }
+      
+      // Add days of the month
+      for (let i = 1; i <= daysInMonth; i++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day';
+        day.textContent = i;
+        
+        // Randomly assign attendance status for demo
+        const status = Math.random() > 0.3 ? 'present' : 'absent';
+        day.classList.add(status);
+        
+        // Add click event to show details
+        day.addEventListener('click', () => {
+          showToast('Attendance Details', `Day ${i}: ${status === 'present' ? 'Present' : 'Absent'}`, 'info');
+        });
+        
+        calendar.appendChild(day);
+      }
+    }
+
+    // Toast notification system
+    function showToast(title, message, type = 'info') {
+      const toastContainer = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+      };
+      
+      toast.innerHTML = `
+        <div class="toast-icon">
+          <i class="${icons[type]}"></i>
+        </div>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      // Animate in
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 10);
+      
+      // Set up close button
+      const closeBtn = toast.querySelector('.toast-close');
+      closeBtn.addEventListener('click', () => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      });
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            toast.remove();
+          }, 300);
+        }
+      }, 5000);
+    }
+
+    // Initialize dashboard chart
+    function initDashboardChart() {
+      const ctx = document.getElementById('dashboard-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+          datasets: [
+            {
+              label: 'Present',
+              data: [85, 82, 90, 87, 88, 80],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              tension: 0.3,
+              fill: true,
+              borderWidth: 2
+            },
+            {
+              label: 'Absent',
+              data: [15, 18, 10, 13, 12, 20],
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              tension: 0.3,
+              fill: true,
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize class distribution chart
+    function initClassChart() {
+      const ctx = document.getElementById('class-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['CS 101', 'MATH 202', 'ENG 150', 'PHY 101', 'CHE 201'],
+          datasets: [{
+            label: 'Students',
+            data: [32, 28, 25, 20, 15],
+            backgroundColor: [
+              'rgba(0, 0, 0, 0.7)',
+              'rgba(0, 0, 0, 0.6)',
+              'rgba(0, 0, 0, 0.5)',
+              'rgba(0, 0, 0, 0.4)',
+              'rgba(0, 0, 0, 0.3)'
+            ],
+            borderColor: [
+              'rgba(0, 0, 0, 1)',
+              'rgba(0, 0, 0, 1)',
+              'rgba(0, 0, 0, 1)',
+              'rgba(0, 0, 0, 1)',
+              'rgba(0, 0, 0, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize analytics chart
+    function initAnalyticsChart() {
+      const ctx = document.getElementById('analytics-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Present', 'Absent', 'Late', 'Excused'],
+          datasets: [{
+            data: [75, 10, 8, 7],
+            backgroundColor: [
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(239, 68, 68, 0.8)',
+              'rgba(245, 158, 11, 0.8)',
+              'rgba(107, 114, 128, 0.8)'
+            ],
+            borderColor: [
+              'rgba(16, 185, 129, 1)',
+              'rgba(239, 68, 68, 1)',
+              'rgba(245, 158, 11, 1)',
+              'rgba(107, 114, 128, 1)'
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize monthly chart
+    function initMonthlyChart() {
+      const ctx = document.getElementById('monthly-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            {
+              label: 'Attendance Rate',
+              data: [82, 85, 88, 87, 90, 92],
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              borderColor: 'rgba(0, 0, 0, 1)',
+              borderWidth: 1,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Students',
+              data: [110, 112, 115, 118, 120, 120],
+              backgroundColor: 'rgba(107, 114, 128, 0.5)',
+              borderColor: 'rgba(107, 114, 128, 1)',
+              borderWidth: 1,
+              type: 'line',
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              min: 70,
+              max: 100
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              min: 100,
+              grid: {
+                drawOnChartArea: false,
+              },
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize QR Scanner
+    function initQRScanner() {
+      const scanner = new Html5Qrcode("reader");
+      scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      ).catch(err => {
+        console.error("QR Scanner error:", err);
+        document.getElementById('qr-message').innerHTML = 
+          '<div class="message message-error">Failed to start QR scanner: ' + err + '</div>';
+      });
+    }
+
+    // Handle QR scan success
+    function onScanSuccess(decodedText) {
+      // Play success sound
+      playSuccessSound();
+      
+      document.getElementById('qr-message').innerHTML = 
+        '<div class="message message-success">Scanned: ' + decodedText + '</div>';
+      
+      // Show student profile popup
+      showStudentPopup(decodedText);
+      
+      // Simulate marking attendance via QR
+      setTimeout(() => {
+        document.getElementById('qr-message').innerHTML = 
+          '<div class="message message-success">✅ Marked Present: ' + decodedText + '</div>';
+        showToast('Attendance Marked', `Present marked for ${decodedText}`, 'success');
+      }, 1000);
+    }
+
+    // Play success sound for QR scan
+    function playSuccessSound() {
+      // In a real app, you would play an actual sound file
+      // For this demo, we'll just log to console
+      console.log("Playing success sound");
+    }
+
+    // Show student profile popup
+    function showStudentPopup(studentId) {
+      const popup = document.getElementById('student-popup');
+      popup.classList.add('show');
+      
+      // Close popup when close button is clicked
+      document.getElementById('close-popup').addEventListener('click', () => {
+        popup.classList.remove('show');
+      });
+      
+      // Close popup when clicking outside
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+          popup.classList.remove('show');
+        }
+      });
+    }
+
+    // Mark attendance
+    function markAttendance(status) {
+      const regno = document.getElementById('regno').value.trim();
+      if (!regno) {
+        document.getElementById('attendance-message').innerHTML = 
+          '<div class="message message-error">Please enter a register number</div>';
+        return;
+      }
+      
+      // Show loading spinner
+      document.getElementById('attendance-message').innerHTML = '<div class="spinner"></div>';
+      
+      // Simulate API call with delay
+      setTimeout(() => {
+        document.getElementById('attendance-message').innerHTML = 
+          '<div class="message message-success">✅ Marked ' + status + ' for ' + regno + '</div>';
+        
+        // Show success animation
+        showSuccessAnimation();
+        
+        // Show toast notification
+        showToast('Attendance Recorded', `${status} marked for ${regno}`, 'success');
+        
+        // Clear input
+        document.getElementById('regno').value = '';
+      }, 1500);
+    }
+
+    // Show success animation
+    function showSuccessAnimation() {
+      // In a real app, you would show an animated checkmark
+      // For this demo, we'll just log to console
+      console.log("Showing success animation");
+    }
+
+    // Fetch history
+    function fetchHistory() {
+      const studentId = document.getElementById('student-filter').value.trim();
+      const fromDate = document.getElementById('from-date').value;
+      const toDate = document.getElementById('to-date').value;
+      
+      // Show loading
+      document.getElementById('history-results').innerHTML = '<div class="spinner"></div>';
+      
+      // Simulate API call and display results
+      setTimeout(() => {
+        const mockData = [
+          { studentId: 'STU001', status: 'Present', date_time: '2023-05-15 09:15', markedBy: 'John Smith' },
+          { studentId: 'STU002', status: 'Absent', date_time: '2023-05-15 09:16', markedBy: 'John Smith' },
+          { studentId: 'STU003', status: 'Present', date_time: '2023-05-15 09:17', markedBy: 'John Smith' },
+          { studentId: 'STU001', status: 'Present', date_time: '2023-05-16 09:14', markedBy: 'John Smith' },
+          { studentId: 'STU004', status: 'Present', date_time: '2023-05-16 09:15', markedBy: 'John Smith' }
+        ];
+        
+        let html = '<table>';
+        html += '<tr><th>RegNo</th><th>Status</th><th>Date Time</th><th>Marked By</th></tr>';
+        
+        mockData.forEach(record => {
+          html += `<tr>
+            <td>${record.studentId}</td>
+            <td><span class="badge ${record.status === 'Present' ? 'badge-present' : 'badge-absent'}">${record.status}</span></td>
+            <td>${record.date_time}</td>
+            <td>${record.markedBy}</td>
+          </tr>`;
+        });
+        
+        html += '</table>';
+        document.getElementById('history-results').innerHTML = html;
+        
+        showToast('History Loaded', 'Attendance history loaded successfully', 'success');
+      }, 1000);
+    }
+
+    // Download Excel
+    function downloadExcel() {
+      showToast('Export Started', 'Preparing Excel file for download...', 'info');
+      // Simulate download delay
+      setTimeout(() => {
+        showToast('Export Complete', 'Excel file downloaded successfully', 'success');
+      }, 2000);
+    }
+
+    // Download CSV
+    function downloadCSV() {
+      showToast('Export Started', 'Preparing CSV file for download...', 'info');
+      // Simulate download delay
+      setTimeout(() => {
+        showToast('Export Complete', 'CSV file downloaded successfully', 'success');
+      }, 2000);
+    }
+
+    // Download PDF
+    function downloadPDF() {
+      showToast('Export Started', 'Preparing PDF file for download...', 'info');
+      // Simulate download delay
+      setTimeout(() => {
+        showToast('Export Complete', 'PDF file downloaded successfully', 'success');
+      }, 2000);
+    }
+
+    // Upload photo
+    function uploadPhoto() {
+      const regno = document.getElementById('photo-regno').value.trim();
+      const file = document.getElementById('photo-file').files[0];
+      
+      if (!regno || !file) {
+        document.getElementById('upload-message').innerHTML = 
+          '<div class="message message-error">Please enter a register number and select a file</div>';
+        return;
+      }
+      
+      // Show loading
+      document.getElementById('upload-message').innerHTML = '<div class="spinner"></div>';
+      
+      // Simulate upload
+      setTimeout(() => {
+        document.getElementById('upload-message').innerHTML = 
+          '<div class="message message-success">✅ Photo uploaded successfully for ' + regno + '</div>';
+        
+        showToast('Upload Successful', `Photo uploaded for ${regno}`, 'success');
+        
+        // Clear inputs
+        document.getElementById('photo-regno').value = '';
+        document.getElementById('photo-file').value = '';
+      }, 1500);
+    }
+
+    // Save user (admin only)
+    function saveUser() {
+      if (!isAdmin()) {
+        document.getElementById('user-message').innerHTML = 
+          '<div class="message message-error">Only administrators can manage users</div>';
+        return;
+      }
+      
+      const username = document.getElementById('manage-username').value.trim();
+      const password = document.getElementById('manage-password').value.trim();
+      const role = document.getElementById('manage-role').value;
+      
+      if (!username || !password) {
+        document.getElementById('user-message').innerHTML = 
+          '<div class="message message-error">Please enter both username and password</div>';
+        return;
+      }
+      
+      // Show loading
+      document.getElementById('user-message').innerHTML = '<div class="spinner"></div>';
+      
+      // Simulate API call
+      setTimeout(() => {
+        document.getElementById('user-message').innerHTML = 
+          '<div class="message message-success">✅ User ' + username + ' saved with role: ' + role + '</div>';
+        
+        showToast('User Saved', `${username} saved successfully`, 'success');
+        
+        // Clear inputs
+        document.getElementById('manage-username').value = '';
+        document.getElementById('manage-password').value = '';
+      }, 1500);
+    }
+
+    // Load users (admin only)
+    function loadUsers() {
+      if (!isAdmin()) {
+        document.getElementById('user-message').innerHTML = 
+          '<div class="message message-error">Only administrators can view users</div>';
+        return;
+      }
+      
+      // Show loading
+      document.getElementById('users-list').innerHTML = '<div class="spinner"></div>';
+      
+      // Simulate API call
+      setTimeout(() => {
+        const mockUsers = [
+          { username: 'admin', role: 'admin', email: 'admin@university.edu' },
+          { username: 'jsmith', role: 'faculty', email: 'jsmith@university.edu' },
+          { username: 'bjohnson', role: 'faculty', email: 'bjohnson@university.edu' },
+          { username: 'student01', role: 'student', email: 'student01@university.edu' }
+        ];
+        
+        let html = '<h3 style="margin-bottom: 16px;">User List</h3><table>';
+        html += '<tr><th>Username</th><th>Role</th><th>Email</th><th>Actions</th></tr>';
+        
+        mockUsers.forEach(user => {
+          html += `<tr>
+            <td>${user.username}</td>
+            <td>${user.role}</td>
+            <td>${user.email}</td>
+            <td>
+              <button class="btn" style="padding: 6px 12px; font-size: 0.8rem;">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+            </td>
+          </tr>`;
+        });
+        
+        html += '</table>';
+        document.getElementById('users-list').innerHTML = html;
+        
+        showToast('Users Loaded', 'User list loaded successfully', 'success');
+      }, 1000);
+    }
+
+    // Logout
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // Show loading
+        document.body.style.opacity = '0.7';
+        
+        // In a real app, this would clear tokens and redirect to login
+        setTimeout(() => {
+          alert('Logged out successfully');
+          // Redirect to login page
+          // window.location.href = 'index.html';
+          document.body.style.opacity = '1';
+        }, 1000);
+      }
+    }
+
+    // Initialize the app when the page loads
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
